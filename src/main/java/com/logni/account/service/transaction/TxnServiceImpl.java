@@ -217,8 +217,6 @@ public class TxnServiceImpl implements TxnService{
         return doTxn( txnRequest,null,true);
     }
 
-    // TODO Disbursement G2P, Bulk Disbursement, From Lock False.
-    // public bigDisbursement secure way
 
 
    // @Transactional
@@ -491,13 +489,6 @@ public class TxnServiceImpl implements TxnService{
         ledgerAcEntriesList.add(ledgerAcEntries);
         return ledgerAcEntriesList;
     }
-
-    //todo will when develop accrued
-    private List<AccruedAcEntries> generateAccrueEntries(Account account, Account remoteAc, TransactionType transactionType){
-        return null;
-    }
-
-
 
     private void validateBalance(Account from,BigDecimal amount){
         if(from.getLedger().getType()== LedgerType.MEMBER){

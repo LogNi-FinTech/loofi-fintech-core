@@ -8,3 +8,4 @@ public interface EodService {
     void calculateAllCloseBalance(Instant closeTime);
 
 }
+

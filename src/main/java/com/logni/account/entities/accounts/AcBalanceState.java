@@ -19,11 +19,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "low_vol_ac_balance_state")
+@Table(name = "ac_balance_state")
 public class AcBalanceState {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "low_vol_ac_balance_state_gen")
-    @SequenceGenerator(name = "low_vol_ac_balance_state_gen", sequenceName = "low_vol_ac_balance_state_id_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ac_balance_state_gen")
+    @SequenceGenerator(name = "ac_balance_state_gen", sequenceName = "ac_balance_state_id_gen")
     @Column(name = "id")
     private Long id;
 

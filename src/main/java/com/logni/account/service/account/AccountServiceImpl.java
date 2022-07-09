@@ -319,7 +319,6 @@ public class AccountServiceImpl implements AccountService{
             throw new CommonException(AccountErrors.INVALID_AC_TYPE,"LEDGER_TYPE_IS_NOT_MEMBER");
         }
         // todo let's guess individual member can't be LOW high volume if ledger not.
-
         // last state + memberEntries sum
         if(time==null)
             time = Instant.now();

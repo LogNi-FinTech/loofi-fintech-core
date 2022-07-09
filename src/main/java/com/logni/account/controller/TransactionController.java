@@ -60,7 +60,7 @@ public class TransactionController {
         return ResponseEntity.ok(txnResponse);
     }
 
-    //todo get txn Details(for Txn id)
+
     @Operation(summary = "Transaction detail", description = "", tags={ "transaction" })
     @GetMapping(path = "/txn/{txnId}")
     ResponseEntity<TxnDetail> txnDetail(@PathVariable("txnId") String txnId){
@@ -74,11 +74,6 @@ public class TransactionController {
         TxnResponse txnResponse = txnService.doReverseTxn(reverseRequest);
         return ResponseEntity.ok(txnResponse);
     }
-// todo internal reverse auto
-//    @Operation(summary = "Txn Auto Reverse", description = "", tags={ "transaction" })
-//    @PostMapping(path = "/reverse/auto")
-//    ResponseEntity<TxnResponse> reverseAuto(@RequestBody @Valid TxnRequest txnRequest){
-//
-//    }
+
 
 }

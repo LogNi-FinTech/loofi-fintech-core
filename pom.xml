@@ -13,7 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>account</name>
-	<description>Account Component For Logni DBS</description>
+	<description>Core Ledger account Component for LogNi FinTech</description>
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>

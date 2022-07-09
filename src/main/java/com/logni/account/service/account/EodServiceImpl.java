@@ -41,7 +41,6 @@ public class EodServiceImpl implements EodService {
     @Autowired
     AccountRepository accountRepository;
 
-
     public void closeBalanceCalculation(Instant closeTime){
         calculateBalanceForSystemAc(closeTime);
         calculateForAllMemberWallet(closeTime);
@@ -61,7 +60,6 @@ public class EodServiceImpl implements EodService {
     }
 
     public void calculateAllCloseBalance(Instant closeTime){
-        calculateBalanceForSystemAc(closeTime);
         List<Account> allMemberAcs = accountRepository.findAllMemberAc(LedgerType.MEMBER);
         calculateCloseBalance(allMemberAcs,closeTime);
     }
