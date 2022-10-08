@@ -41,7 +41,7 @@ public class TransactionTest {
 
     public void bankCashIn(){
 
-        String toAc = "01674242986";
+        String toAc = "01674242000";
         String fromAc = LedgerConstant.CASH_HAND_CODE.toString();
 
         try{
@@ -54,7 +54,6 @@ public class TransactionTest {
                     .put("transactionType", new JSONObject().put("txnCode",TxnTypeConstant.BANK_CASH_IN) )
                     .put("note","Bank CashIn Test")
                     .put("referenceId","93483734")
-                  //  .put("data",new JSONObject().put("bankRef","B-0038383"))
                     .put("channel","REST")
                     .put("requestId","9484848")
                     .put("maker","TEST-1")
@@ -76,15 +75,14 @@ public class TransactionTest {
             Assertions.assertEquals(1000.00,toBalance.getBalance().doubleValue());
 
         }catch (JSONException ex){
-
-
+            ex.printStackTrace();
         }
     }
 
     public void sendMoney(){
 
-        String fromAc = "01674242986";
-        String toAc = "01673173598";
+        String fromAc = "01674242000";
+        String toAc = "01674242001";
         Double amount = 100.00;
         Double fee = 5.00;
 
@@ -134,7 +132,7 @@ public class TransactionTest {
 
         // fee from merchant
 
-        String fromAc = "01674242986";
+        String fromAc = "01674242000";
         String toAc = "01674242920";
         Double amount = 100.00;
         Double fee = 1.00;
@@ -208,8 +206,7 @@ public class TransactionTest {
                     toBalance.getBalance().doubleValue());
 
             // fee from customer
-
-            fromAc = "01674242986";
+            fromAc = "01674242000";
             toAc = "01674242921";
             amount = 100.00;
             fee = 1.00;
@@ -220,11 +217,8 @@ public class TransactionTest {
 
             toBalanceInit = restTemplate.getForObject(baseUrl + "/api/v1/account/balance/" + toAc,
                     AcBalance.class);
-
-
                 headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
-
                 requestParent = new TxnRequest();
                 requestParent.setFromAc(fromAc);
                 requestParent.setToAc(toAc);
@@ -235,8 +229,6 @@ public class TransactionTest {
                 requestParent.setReferenceId("88383838") ;
                 requestParent.setRequestId("8484848");
                 requestParent.setData(null);
-
-
 
          paymentFeeType = new TransactionType();
         paymentFeeType.setTxnCode(TxnTypeConstant.SF_PAYMENT_FROM_CUSTOMER);
@@ -285,7 +277,6 @@ public class TransactionTest {
     }
 
     public void distbankCashIn(){
-
     }
 
     public void cashOutAgentPoint(){
@@ -293,7 +284,6 @@ public class TransactionTest {
     }
 
     public void notEnoughBalance(){
-
     }
 
     public void journalTest(){
@@ -303,11 +293,6 @@ public class TransactionTest {
 
     }
 
-    public void testConcurrentTxnLockLowValue(){
 
-    }
-    public void testConcurrentTxnLockHighValue(){
-
-    }
 
 }

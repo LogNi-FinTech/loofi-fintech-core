@@ -57,8 +57,6 @@ public class TxnTypeAndAccountValidation implements Validation {
                     AccountErrors.TXN_TYPE_IS_NOT_ENABLE),AccountErrors.ERROR_MAP.get(AccountErrors.TXN_TYPE_IS_NOT_ENABLE));
         }
         if(!from.getLedger().getId().equals(txnType.getFromType().getId())){
-            System.out.println(from.getLedger().getId());
-            System.out.println(txnType.getFromType().getId());
             throw new TxnValidationException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION,
                     AccountErrors.NOT_ALLOWED_FOR_TXN_TYPE),AccountErrors.ERROR_MAP.get(AccountErrors.NOT_ALLOWED_FOR_TXN_TYPE));
 

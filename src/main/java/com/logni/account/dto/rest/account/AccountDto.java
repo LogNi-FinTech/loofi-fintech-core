@@ -5,11 +5,13 @@ import com.logni.account.entities.accounts.AccountType;
 import com.logni.account.enums.AccountState;
 
 import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -17,28 +19,28 @@ import java.util.List;
 @Setter
 public class AccountDto {
 
-    @NotBlank
-    private String name;
-    @NotBlank
-    private String identifier;
-    @NotNull
-    @Min(1)
-    private Long ledgerId;
+   @NotBlank
+   private String name;
 
-    private String ledgerName;
+   @NotBlank
+   private String identifier;
 
-    @NotBlank
-    String customerId;
+   @NotNull
+   @Min(1)
+   private Long ledgerId;
 
-    private AccountState state;
+   private String ledgerName;
 
-    private AccountType type;
+   @NotBlank String customerId;
 
-    List<AccountTag> tagList;
+   private AccountState state;
 
-    private BigDecimal lowerLimit;
-    private String alternativeAccountNumber;
+   private AccountType type;
 
+   List<AccountTag> tagList;
 
+   private BigDecimal lowerLimit;
+
+   private String alternativeAccountNumber;
 
 }

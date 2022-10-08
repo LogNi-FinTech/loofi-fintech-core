@@ -40,7 +40,7 @@ public class LedgerController {
     @Autowired
     AccountService accountService;
 
-    @Operation(summary = "Create Ledger.", description = "", tags={ "ledger" })
+    @Operation(summary = "Create Ledger.",  tags={ "ledger" })
     @PostMapping
     public ResponseEntity<Ledger> createLedger(@RequestBody @Valid Ledger ledger){
         Ledger ledgerResp = ledgerService.createLedger(ledger);
@@ -48,45 +48,40 @@ public class LedgerController {
     }
 
     @Transactional(readOnly = true)
-    @Operation(summary = "Get Ledger Info.", description = "", tags={ "ledger" })
+    @Operation(summary = "Get Ledger Info.", tags={ "ledger" })
     @GetMapping("/{id}")
     public ResponseEntity<Ledger> getLedger(@PathVariable("id") Long id){
 
         Optional<Ledger> ledgerOptional = ledgerRepository.findById(id);
-        if(ledgerOptional.isPresent()){
-            return ResponseEntity.ok(ledgerOptional.get());
-        }else {
-            return ResponseEntity.notFound().build();
-        }
+        return ledgerOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Get Ledger Info.", description = "", tags={ "ledger" })
+    @Operation(summary = "Get Ledger Info.", tags={ "ledger" })
     @GetMapping("/code/{code}")
     public ResponseEntity<Ledger> getLedgerByCode(@PathVariable("code") String code){
         return ResponseEntity.ok().body(ledgerRepository.findByLedgerCode(code));
     }
-    @Operation(summary = "Ledger List.", description = "", tags={ "ledger" })
+    @Operation(summary = "Ledger List.", tags={ "ledger" })
     @GetMapping
     public ResponseEntity<Page<Ledger>> ledgers(Pageable pageable){
         return ResponseEntity.ok().body(ledgerRepository.findAll(pageable));
     }
-    
-    @Operation(summary = "Ledger List By Type", description = "", tags={ "ledger ByType" })
+    @Operation(summary = "Ledger List By Type",  tags={ "ledger ByType" })
     @GetMapping("/byType/{type}")
     public ResponseEntity<List<Ledger>> ledgerByType(@PathVariable("type") LedgerType type ){
         return ResponseEntity.ok().body(ledgerRepository.findAllByType(type));
     }
 
     @Transactional
-    @Operation(summary = "Update Ledger .", description = "", tags={ "ledger" })
+    @Operation(summary = "Update Ledger.",  tags={ "ledger" })
     @PutMapping
     public ResponseEntity updateLedger(@RequestBody @Valid Ledger ledger){
         ledgerRepository.save(ledger);
-        return  ResponseEntity.ok().body("");
+        return  ResponseEntity.ok().build();
     }
 
 
-    @Operation(summary = "Ledger Balance.", description = "", tags={ "ledger" })
+    @Operation(summary = "Ledger Balance.",  tags={ "ledger" })
     @GetMapping("/balance/{ledgerCode}")
     public ResponseEntity<AcBalance> getLedgerBalance(@PathVariable("ledgerCode") String ledgerCode){
         log.debug("Ledger Balance.Identifier:{}",ledgerCode);
@@ -97,7 +92,7 @@ public class LedgerController {
 
     }
 
-    @Operation(summary = "Ledger Statement.", description = "", tags={ "ledger" })
+    @Operation(summary = "Ledger Statement.", tags={ "ledger" })
     @GetMapping("/statement")
     public ResponseEntity<Page<StmtTxn>> getAccountStatement(@PathParam("ledgerCode") String ledgerCode,
                                                              Pageable pageable){
@@ -105,7 +100,7 @@ public class LedgerController {
     }
 
 
-    @Operation(summary = "All Ledger balance.", description = "", tags={ "ledger" })
+    @Operation(summary = "All Ledger balance.",  tags={ "ledger" })
     @GetMapping("/all/balance")
     public ResponseEntity<List<LedgerBalanceDto>> allLedgersBalance(@RequestParam(value = "time",required = false)Instant time){
         if(time==null)
@@ -113,7 +108,7 @@ public class LedgerController {
         return ResponseEntity.ok().body(ledgerService.getAllLedgerBalance(time));
     }
 
-    @Operation(summary = "All Ledger balance.", description = "", tags={ "ledger" })
+    @Operation(summary = "All Ledger balance.",  tags={ "ledger" })
     @GetMapping("/all/open/balance")
     public ResponseEntity<List<LedgerBalanceDto>> allLedgersOpenBalance(@RequestParam(value = "openDate",required = true)String openDate){
         Instant time = AcDateTimeUtil.convertStringToGMT(openDate);
@@ -125,14 +120,14 @@ public class LedgerController {
             return ResponseEntity.ok().body(ledgerService.getAllLedgerBalance(time));
     }
 
-    @Operation(summary = "All System Ledger balance.", description = "", tags={ "ledger" })
+    @Operation(summary = "All System Ledger balance.", tags={ "ledger" })
     @GetMapping("/system/balance")
     public ResponseEntity<List<LedgerBalanceDto>> systemLedgersBalance(@RequestParam(value = "time",required = false)Instant time){
         if(time==null)
             time = Instant.now();
         return ResponseEntity.ok().body(ledgerService.getSystemLedgerBalance(time));
     }
-    @Operation(summary = "All member Ledger balance.", description = "", tags={ "ledger" })
+    @Operation(summary = "All member Ledger balance.",  tags={ "ledger" })
     @GetMapping("/member/balance")
     public ResponseEntity<List<LedgerBalanceDto>> memberLedgersBalance(@RequestParam(value = "time",required = false)Instant time){
         if(time==null)

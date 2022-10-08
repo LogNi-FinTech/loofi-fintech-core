@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface LedgerService {
     Ledger createLedger(Ledger ledger);
+
     List<LedgerBalanceDto> getAllLedgerBalance(Instant time);
     List<LedgerBalanceDto> getSystemLedgerBalance(Instant time);
     List<LedgerBalanceDto> getMemberLedgerBalance(Instant time);

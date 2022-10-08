@@ -50,22 +50,22 @@ public class AcControllerTest {
     public void setUpMemberWallet() throws Exception{
         List<JSONObject> customerList = new ArrayList<>();
 
-        customerList.add(new JSONObject().put("name","Azom Shahriar")
-                .put("identifier","01674242986")
-                .put("customerId","01674242986")
+        customerList.add(new JSONObject().put("name","Test Customer 1")
+                .put("identifier","01674242000")
+                .put("customerId","01674242000")
                 .put("state","ACTIVE")
                 .put("ledgerId",getLedgerId(LedgerConstant.CUSTOMER_AC_CODE)));
 
-        customerList.add(new JSONObject().put("name","Tamrin Shahriar")
-                .put("identifier","01673173598")
-                .put("customerId","01673173598")
+        customerList.add(new JSONObject().put("name","Test Customer 2")
+                .put("identifier","01674242001")
+                .put("customerId","01674242001")
                 .put("state","ACTIVE")
                 .put("ledgerId",getLedgerId(LedgerConstant.CUSTOMER_AC_CODE)));
 
-        customerList.add(new JSONObject().put("name","Masum Shahriar")
-                .put("identifier","01518465254")
-                .put("customerId","01518465254")
-               // .put("state","ACTIVE")
+        customerList.add(new JSONObject().put("name","Test Customer 3")
+                .put("identifier","01674242002")
+                .put("customerId","01674242002")
+                .put("state","ACTIVE")
                 .put("ledgerId",getLedgerId(LedgerConstant.CUSTOMER_AC_CODE)));
 
 
@@ -161,10 +161,7 @@ public class AcControllerTest {
                     Assertions.assertEquals(0.00,acBalance.getBalance().doubleValue());
 
                 }catch (JSONException ex){
-
-
                 }
-
 
             });
         });

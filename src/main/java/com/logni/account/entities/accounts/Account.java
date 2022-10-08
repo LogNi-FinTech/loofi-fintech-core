@@ -48,6 +48,7 @@ public class Account extends Auditable<String> {
     @Column(name = "signature_authorities")
     private String signatureAuthorities;
 
+    //TODO later work with this private Money amount;
     @Column(name = "balance",precision = 19,scale = 6)
     private BigDecimal balance; // only for low volume account
 
@@ -74,6 +75,7 @@ public class Account extends Auditable<String> {
     private String alternativeAccountNumber; // for legacy system
 
     private Instant activationDate;
+
 
     public Account() {
     }

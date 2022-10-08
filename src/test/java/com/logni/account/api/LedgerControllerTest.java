@@ -57,7 +57,6 @@ public class LedgerControllerTest {
                         .put("description",LedgerConstant.MERCHANT_AC)
                         .put("head", AccountHead.LIABILITY)
                         .put("type", LedgerType.MEMBER)
-
                         .put("onlyParent", false)
                         .put("showAccountsInChart",true));
 
@@ -66,7 +65,6 @@ public class LedgerControllerTest {
                         .put("description",LedgerConstant.AGENT_AC)
                         .put("head", AccountHead.LIABILITY)
                         .put("type", LedgerType.MEMBER)
-
                         .put("onlyParent", false)
                         .put("showAccountsInChart",true));
 
@@ -134,7 +132,6 @@ public class LedgerControllerTest {
 
     }
 
-
    // @Order(1)
    // @Test
     public void setUpLedger() throws Exception {
@@ -149,7 +146,6 @@ public class LedgerControllerTest {
                     Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 
             });
-
 
     }
 

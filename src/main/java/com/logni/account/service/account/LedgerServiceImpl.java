@@ -1,124 +1,136 @@
 package com.logni.account.service.account;
 
 import com.logni.account.config.UserData;
+import com.logni.account.dto.rest.account.AcBalance;
 import com.logni.account.dto.rest.account.LedgerBalanceDto;
 import com.logni.account.entities.accounts.Account;
-import com.logni.account.entities.accounts.AccountLock;
 import com.logni.account.entities.accounts.Ledger;
+import com.logni.account.entities.accounts.LedgerBalanceArchive;
 import com.logni.account.enums.AccountState;
 import com.logni.account.enums.LedgerType;
-import com.logni.account.repository.account.AcLockRepository;
 import com.logni.account.repository.account.AccountRepository;
+import com.logni.account.repository.account.LedgerBalanceArchiveRepo;
 import com.logni.account.repository.account.LedgerRepository;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Service
 public class LedgerServiceImpl implements LedgerService {
+    @Autowired
+    LedgerRepository ledgerRepository;
 
-   @Autowired
-   LedgerRepository ledgerRepository;
+    @Autowired
+    AccountRepository accountRepository;
+    @Autowired
+    AccountService accountService;
 
-   @Autowired
-   AccountRepository accountRepository;
+    @Autowired
+    LedgerBalanceArchiveRepo ledgerBalanceArchiveRepo;
 
-   @Autowired
-   AccountService accountService;
+    @Resource(name = "requestScopeTokenData")
+    private UserData userData;
 
-   @Autowired
-   public AcLockRepository acLockRepository;
+    @Transactional
+    public Ledger createLedger(Ledger ledger){
 
-   @Resource(name = "requestScopeTokenData")
-   private UserData userData;
+        ledger.setCreatedDate(Instant.now());
+        ledger.setCreatedBy(userData.getUserId()==null?"REST":userData.getUserId());
+        ledger = ledgerRepository.save(ledger);
+        //todo work with created by
 
-   @Transactional
-   public Ledger createLedger(Ledger ledger) {
+        if(ledger.getType()== LedgerType.SYSTEM&&!ledger.getOnlyParent()){
+            Account account = new Account(ledger.getLedgerCode(),ledger.getName(),null);
 
-      ledger.setCreatedDate(Instant.now());
-      ledger.setCreatedBy(userData.getUserId() == null ? "REST" : userData.getUserId());
-      ledger = ledgerRepository.save(ledger);
-      //todo work with created by
+            account.setState(AccountState.ACTIVE);
+            account.setCreatedDate( Instant.now());
+            account.setLedger(ledger);
+            account.setCreatedBy(ledger.getCreatedBy());
+            account = accountRepository.save(account);
 
-      if (ledger.getType() == LedgerType.SYSTEM && !ledger.getOnlyParent()) {
-         Account account = new Account(ledger.getLedgerCode(), ledger.getName(), null);
+            ledger.setSystemAccount(account);
+            ledger = ledgerRepository.save(ledger);
+        }
 
-         account.setState(AccountState.ACTIVE);
-         account.setCreatedDate(Instant.now());
-         account.setLedger(ledger);
-         account.setCreatedBy(ledger.getCreatedBy());
-         account.setBalance(BigDecimal.ZERO);
-         account = accountRepository.save(account);
+     return ledger;
+    }
 
-         ledger.setSystemAccount(account);
-         ledger = ledgerRepository.save(ledger);
-         AccountLock accountLock = new AccountLock();
-         accountLock.setAccountId(account.getId());
-         acLockRepository.save(accountLock);
-      }
 
-      return ledger;
-   }
+    public List<LedgerBalanceDto> getAllLedgerBalance(Instant time){
+       List<Ledger> ledgerList = ledgerRepository.findAll();
 
-   public List<LedgerBalanceDto> getAllLedgerBalance(Instant time) {
-      List<Ledger> ledgerList = ledgerRepository.findAll();
+       return getLedgerBalance(ledgerList,time);
+    }
+    public List<LedgerBalanceDto> getSystemLedgerBalance(Instant time){
+        List<Ledger> ledgerList = ledgerRepository.findAllByType(LedgerType.SYSTEM);
+        return getLedgerBalance(ledgerList,time);
+    }
+    public List<LedgerBalanceDto> getMemberLedgerBalance(Instant time){
+        List<Ledger> ledgerList = ledgerRepository.findAllByType(LedgerType.MEMBER);
+        return getLedgerBalance(ledgerList,time);
+    }
 
-      return getLedgerBalance(ledgerList, time);
-   }
+    public List<LedgerBalanceDto> getLedgerBalance( List<Ledger> ledgerList ,Instant time ){
+        List<LedgerBalanceDto> ledgerBalanceDtos = new ArrayList<>();
 
-   public List<LedgerBalanceDto> getSystemLedgerBalance(Instant time) {
-      List<Ledger> ledgerList = ledgerRepository.findAllByType(LedgerType.SYSTEM);
-      return getLedgerBalance(ledgerList, time);
-   }
+        ledgerList.forEach(ledger -> {
+            BigDecimal balance = BigDecimal.ZERO;
+            if(!ledger.getOnlyParent()){
+                LedgerBalanceArchive balanceArchive = ledgerBalanceArchiveRepo.findByLedgerAndBalanceAt(ledger,time);
 
-   public List<LedgerBalanceDto> getMemberLedgerBalance(Instant time) {
-      List<Ledger> ledgerList = ledgerRepository.findAllByType(LedgerType.MEMBER);
-      return getLedgerBalance(ledgerList, time);
-   }
+                if(ledger.getType()==LedgerType.SYSTEM){
+                    if(balanceArchive!=null){
+                        balance = balanceArchive.getBalance();
+                    }else {
+                        balance= accountService.getLedgerBalance(ledger,time);
+                    }
 
-   public List<LedgerBalanceDto> getLedgerBalance(List<Ledger> ledgerList, Instant time) {
-      List<LedgerBalanceDto> ledgerBalanceDtos = new ArrayList<>();
-
-      ledgerList.forEach(ledger -> {
-         BigDecimal balance = BigDecimal.ZERO;
-         if (!ledger.getOnlyParent()) {
-
-            if (ledger.getType() == LedgerType.SYSTEM) {
-               balance = accountService.getLedgerBalance(ledger, time);
-            } else {
-               balance = accountService.getMemberLedgerBalance(ledger, time);
+                }else {
+                    if(balanceArchive!=null){
+                        balance = balanceArchive.getBalance();
+                    }else {
+                        balance = accountService.getMemberLedgerBalance(ledger,time);
+                    }
+                }
+                if(balanceArchive==null){
+                    saveLedgerBalanceAtArchive(ledger,balance,time);
+                }
             }
-         }
-         ledgerBalanceDtos.add(adaptLedgerDto(ledger, balance, time));
+            ledgerBalanceDtos.add(adaptLedgerDto(ledger,balance,time));
 
-      });
-      return ledgerBalanceDtos;
-   }
+        });
+        return ledgerBalanceDtos;
+    }
 
-   private LedgerBalanceDto adaptLedgerDto(Ledger ledger, BigDecimal balance, Instant time) {
+    private void saveLedgerBalanceAtArchive(Ledger ledger, BigDecimal balance,Instant time){
+        LedgerBalanceArchive ledgerBalanceArchive = new LedgerBalanceArchive();
+        ledgerBalanceArchive.setBalance(balance);
+        ledgerBalanceArchive.setLedger(ledger);
+        ledgerBalanceArchive.setBalanceAt(time);
+        ledgerBalanceArchive.setCreatedOn(Instant.now());
+        ledgerBalanceArchiveRepo.save(ledgerBalanceArchive);
+    }
 
-      LedgerBalanceDto ledgerBalanceDto = new LedgerBalanceDto();
-      ledgerBalanceDto.setBalance(balance);
-      ledgerBalanceDto.setBalanceAt(time);
-      ledgerBalanceDto.setHead(ledger.getHead());
-      ledgerBalanceDto.setLedgerCode(ledger.getLedgerCode());
-      ledgerBalanceDto.setOnlyParent(ledger.getOnlyParent());
-      ledgerBalanceDto.setType(ledger.getType());
-      ledgerBalanceDto.setName(ledger.getName());
-      if (ledger.getParentLedger() != null) {
-         ledgerBalanceDto.setParentLedgerDto(adaptLedgerDto(ledger.getParentLedger(), BigDecimal.ZERO, time));
-      }
-      return ledgerBalanceDto;
-   }
+    private LedgerBalanceDto adaptLedgerDto(Ledger ledger,BigDecimal balance, Instant time){
 
+        LedgerBalanceDto ledgerBalanceDto = new LedgerBalanceDto();
+        ledgerBalanceDto.setBalance(balance);
+        ledgerBalanceDto.setBalanceAt(time);
+        ledgerBalanceDto.setHead(ledger.getHead());
+        ledgerBalanceDto.setLedgerCode(ledger.getLedgerCode());
+        ledgerBalanceDto.setOnlyParent(ledger.getOnlyParent());
+        ledgerBalanceDto.setType(ledger.getType());
+        ledgerBalanceDto.setName(ledger.getName());
+        if(ledger.getParentLedger()!=null)
+            ledgerBalanceDto.setParentLedgerDto(adaptLedgerDto(ledger.getParentLedger(),BigDecimal.ZERO,time));
+        return ledgerBalanceDto;
+    }
 }

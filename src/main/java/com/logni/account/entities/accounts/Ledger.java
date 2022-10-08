@@ -28,6 +28,8 @@ public class Ledger  extends Auditable<String> {
     @Column(name = "type")
     private LedgerType type;//Member, System
 
+    // will be head ledger customer,merchant,agent,distributor,system,disbursement,
+
 
     @NotNull(message = "Ledger head is mandatory")
     @Enumerated(EnumType.STRING)
@@ -87,6 +89,7 @@ public class Ledger  extends Auditable<String> {
         this.type = type;
     }
 
+
     public AccountHead getHead() {
         return head;
     }
@@ -142,6 +145,7 @@ public class Ledger  extends Auditable<String> {
     public void setParentLedger(Ledger parentLedger) {
         this.parentLedger = parentLedger;
     }
+
 
     public Boolean getShowAccountsInChart() {
         return showAccountsInChart;

@@ -19,26 +19,26 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "member_ledger_balance_state")
-public class MemberLedgerBalanceState {
-
+@Table(name = "member_balance_state")
+public class MemberBalanceState {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_ledger_balance_state_gen")
-    @SequenceGenerator(name = "member_ledger_balance_state_gen", sequenceName = "member_ledger_balance_state_id_gen")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_balance_state_gen")
+    @SequenceGenerator(name = "member_balance_state_gen", sequenceName = "member_balance_state_id_gen")
     @Column(name = "id")
     private Long id;
 
     @ManyToOne
-    private Ledger ledger;
+    private Account account;
 
     @Column(name = "balance",precision = 19,scale = 6)
     private BigDecimal balance;
 
     @Column(name = "balance_at")
     private Instant balanceAt;
-    @Column(name = "created_on")
-    private Instant createdOn;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Transactions transaction; // this should be unique
 
 
 }
