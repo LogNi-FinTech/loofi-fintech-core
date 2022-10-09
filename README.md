@@ -4,6 +4,8 @@ Core ledger &amp; balance and transaction system for holding, receiving &amp; se
 
 Anyone can explore, contribute and distribute this source code. 
 
+Technology: Spring Boot, Postgres
+
 LogNi Core Engine can be used in the following domain - 
 - Bank
 - FinTech
@@ -17,14 +19,14 @@ LogNi Core Engine can be used in the following domain -
 - Neo Banking
 - Open Banking
 - Payment Platform
-- Lending
-- Investment
+- Lending Platform
+- Investment Platform
 - Payment Processor
-- Any tech company who want to receive, store and disburse money
+- Any tech company who want to receive, store and disburse e-money
 - Embedded finance
 - BaaS (Bank as a Service)
 
-Contribution areas by any java developer:
+Contribution areas by any developer:
 
 - API Documentation
 - Documentation
@@ -34,8 +36,8 @@ Contribution areas by any java developer:
 - MySQL & Oracle implementation
 - Add new features
 
-Slack Group:
-FaceBook Group:https://www.facebook.com/groups/1106852439933044
-LinkedIn : https://www.linkedin.com/groups/14134418/
-
+- Slack Group:
+- FaceBook Group:https://www.facebook.com/groups/1106852439933044
+- LinkedIn : https://www.linkedin.com/groups/14134418/
+- Email :  lognifintech@gmail.com
 
