@@ -26,7 +26,7 @@ LogNi Core Engine can be used in the following domain -
 - Embedded finance
 - BaaS (Bank as a Service)
 
-Contribution areas by any developer:
+# Anyone can contribute following areas:
 
 - API Documentation
 - Documentation
@@ -36,6 +36,7 @@ Contribution areas by any developer:
 - MySQL & Oracle implementation
 - Add new features
 
+# Contact:
 - Slack Group:
 - FaceBook Group:https://www.facebook.com/groups/1106852439933044
 - LinkedIn : https://www.linkedin.com/groups/14134418/
