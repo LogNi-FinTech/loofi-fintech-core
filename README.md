@@ -30,11 +30,12 @@ LogNi Core Engine can be used in the following domain -
 
 - API Documentation
 - Documentation
-- Sucurity 
+- Security 
 - Authentication Service/module
 - Code Formatting and clean code
 - MySQL & Oracle implementation
 - Add new features
+- Sonarlint & code quality check
 
 # Contact:
 - Slack Group:
