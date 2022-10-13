@@ -1,4 +1,4 @@
-# LogNi-fintech-core
+# LoogNi-fintech-core
 Open Source Cloud Native FinTech Core Platform.(Community Edition).
 Core ledger &amp; balance and transaction system for holding, receiving &amp; sending money.
 
