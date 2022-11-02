@@ -26,6 +26,11 @@ LogNi Core Engine can be used in the following domain -
 - Embedded finance
 - BaaS (Bank as a Service)
 
+# Contribution guideline
+- fork the repo
+- create a branch
+- create pull request
+
 # Anyone can contribute following areas:
 
 - API Documentation
@@ -39,7 +44,8 @@ LogNi Core Engine can be used in the following domain -
 
 # Contact:
 - Slack Group:
-- FaceBook Group:https://www.facebook.com/groups/1106852439933044
+- FaceBook: 
 - LinkedIn : https://www.linkedin.com/groups/14134418/
+- Email: lognifintech@gmail.com
 
 
