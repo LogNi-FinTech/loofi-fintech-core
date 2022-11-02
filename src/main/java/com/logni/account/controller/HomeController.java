@@ -10,7 +10,7 @@ public class HomeController {
 
     @GetMapping("/")
     public @ResponseBody  String home(){
-        return "Hello LogNi Core Wallet/Account";
+        return "Hello LoogNi Core Wallet/Account";
     }
 
 

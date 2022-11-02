@@ -38,7 +38,7 @@ public class MemberBalanceState {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    private Transactions transaction; // this should be unique
+    private Transactions transaction;
 
 
 }

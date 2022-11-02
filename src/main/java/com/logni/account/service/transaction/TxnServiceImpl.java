@@ -26,6 +26,7 @@ import com.logni.account.utils.Constants;
 import com.logni.account.validation.transaction.TxnAcTypeValidator;
 import com.logni.account.validation.transaction.TxnValidator;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
@@ -44,45 +45,25 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TxnServiceImpl implements TxnService {
 
-  @Autowired
-  TxnValidator txnValidator;
-
-  @Autowired
-  TxnAcTypeValidator txnAcTypeValidator;
-
-  @Autowired
-  AccountService accountService;
-
-  @Autowired
-  TxnTypeService txnTypeService;
-
-  @Autowired
-  TransactionRepository transactionRepository;
-
-  @Autowired
-  MemberAcEntriesRepository memberAcEntriesRepository;
-
-  @Autowired
-  LedgerAcEntriesRepository ledgerAcEntriesRepository;
-
-  @Autowired
-  AccountRepository accountRepository;
-
-  @Autowired
-  AcLockRepository acLockRepository;
-
-  @Autowired
-  MemberBalanceStateRepository memberBalanceStateRepository;
+  private final TxnValidator txnValidator;
+  private final TxnAcTypeValidator txnAcTypeValidator;
+  private final AccountService accountService;
+  private final TxnTypeService txnTypeService;
+  private final TransactionRepository transactionRepository;
+  private final MemberAcEntriesRepository memberAcEntriesRepository;
+  private final LedgerAcEntriesRepository ledgerAcEntriesRepository;
+  private final AccountRepository accountRepository;
+  private final AcLockRepository acLockRepository;
+  private final MemberBalanceStateRepository memberBalanceStateRepository;
 
 
   @Transactional
   public TxnResponse doJournalTxn(JournalRequest journalRequest) {
     validateJournalRequest(journalRequest);
-
     Transactions transaction = generateTxn(journalRequest);
-
     journalRequest.getDebtors().forEach(txnLine -> {
       TransactionType txnType = txnTypeService.getTxnType(txnLine.getTxnType());
       txnTypeNotFoundCheck(txnType);
@@ -103,7 +84,6 @@ public class TxnServiceImpl implements TxnService {
       if (from.getLedger().getType() == LedgerType.SYSTEM) {
         fromLedgerAcEntries = generateLedgerAcEntries(from, remoteAc, txnType, txnLine.getAmount(), transaction, false);
       }
-
       if (fromLedgerAcEntries != null) {
         ledgerAcEntriesRepository.saveAll(fromLedgerAcEntries);
       }
@@ -113,7 +93,6 @@ public class TxnServiceImpl implements TxnService {
           updateMemberBalance(memberAcEntries, transaction);
         });
       }
-
     });
 
     journalRequest.getCreditors().forEach(txnLine -> {
@@ -128,14 +107,12 @@ public class TxnServiceImpl implements TxnService {
       }
       List<MemberAcEntries> toMemberAcEntries = null;
       List<LedgerAcEntries> toLedgerAcEntries = null;
-
       if (to.getLedger().getType() == LedgerType.MEMBER) {
         toMemberAcEntries = generateMemberAcEntries(to, remoteAc, txnType, txnLine.getAmount(), transaction, true);
       }
       if (to.getLedger().getType() == LedgerType.SYSTEM) {
         toLedgerAcEntries = generateLedgerAcEntries(to, remoteAc, txnType, txnLine.getAmount(), transaction, true);
       }
-
       if (toLedgerAcEntries != null) {
         ledgerAcEntriesRepository.saveAll(toLedgerAcEntries);
       }
@@ -146,15 +123,13 @@ public class TxnServiceImpl implements TxnService {
         });
       }
     });
-
-    return new TxnResponse(transaction.getId(), Constants.STATUS_PROCESSED);
-
+    return new TxnResponse(transaction.getTxnId(), Constants.STATUS_PROCESSED);
   }
 
   private Transactions generateTxn(JournalRequest journalRequest) {
 
     Transactions transaction = new Transactions();
-    transaction.setId(generateTxnId());
+    transaction.setTxnId(generateTxnId());
     transaction.setChannel(journalRequest.getChannel());
     transaction.setData(journalRequest.getData());
     transaction.setDescription((journalRequest.getDescription() != null ? journalRequest.getDescription() : "") + (journalRequest.getNote() != null
@@ -164,7 +139,6 @@ public class TxnServiceImpl implements TxnService {
     transaction.setReferenceId(journalRequest.getReferenceId());
     transaction.setTag(journalRequest.getTag());
     transaction.setTxnTime(Instant.now());
-
     transaction.setCreatedBy(journalRequest.getMaker() + "-" + journalRequest.getChecker());
     transaction.setCreatedOn(Instant.now());
     return transactionRepository.save(transaction);
@@ -203,7 +177,6 @@ public class TxnServiceImpl implements TxnService {
 
   @Transactional
   public TxnResponse doBulkTxn(BulkTxnRequest bulkTxnRequest) {
-    // First txn will be parent.
     List<TxnResponse> responseList = new ArrayList<>();
     TransactionType transactionType = txnTypeService.getTxnType(bulkTxnRequest.getTxnRequestList().get(0).getTransactionType());
     TxnRequest parentTxnRequest = bulkTxnRequest.getTxnRequestList().get(0);
@@ -216,7 +189,6 @@ public class TxnServiceImpl implements TxnService {
       responseList.add(doTxn(txnRequest, transaction, isParent));
       isParent = false;
     }
-
     return responseList.get(0);
   }
 
@@ -241,17 +213,13 @@ public class TxnServiceImpl implements TxnService {
     } else {
       to = accountService.getAccountByIdentifier(txnRequest.getToAc());
     }
-
     transaction = performTxn(from, to, transactionType, txnRequest, txnRequest.getAmount(), transaction, isFromLock);
     return buildTxnResponse(txnRequest, from, to, transaction);
-
   }
 
   private Transactions performTxn(Account from, Account to, TransactionType txnType, TxnRequest txnRequest, BigDecimal amount,
                                   Transactions transaction, Boolean isFromLock) {
     txnAcTypeValidator.validate(from, to, txnType);
-
-    //lock MEMBER from AC and TO AC
     lockAccounts(from, to, isFromLock);
     validateBalance(from, amount);
     if (transaction == null) {
@@ -269,7 +237,6 @@ public class TxnServiceImpl implements TxnService {
       if (!txnFee.isEnabled()) {
         continue;
       }
-
       TransactionType genTxnType = txnFee.getGeneratedTxnType();
       Account from = null;
       Account to = null;
@@ -378,18 +345,15 @@ public class TxnServiceImpl implements TxnService {
   }
 
   private void lockAccounts(Account from, Account to, Boolean isFromLock) {
-
     if (from.getLedger().getType() == LedgerType.MEMBER && isFromLock) {
       acLockRepository.findByAccountId(from.getId());
     }
-
     if (to.getLedger().getType() == LedgerType.MEMBER && isFromLock) {
       acLockRepository.findByAccountId(to.getId());
     }
   }
 
   public void performLedgerEntries(Account from, Account to, TransactionType type, BigDecimal amount, Transactions transaction) {
-
     List<MemberAcEntries> fromMemberAcEntries = null;
     List<LedgerAcEntries> fromLedgerAcEntries = null;
     List<MemberAcEntries> toMemberAcEntries = null;
@@ -404,7 +368,6 @@ public class TxnServiceImpl implements TxnService {
     } else {
       toLedgerAcEntries = generateLedgerAcEntries(to, from, type, amount, transaction, true);
     }
-
     if (fromMemberAcEntries != null) {
       memberAcEntriesRepository.saveAll(fromMemberAcEntries);
       fromMemberAcEntries.forEach(memberAcEntries -> {
@@ -448,7 +411,7 @@ public class TxnServiceImpl implements TxnService {
   private Transactions generateTxn(TransactionType type, TxnRequest txnRequest) {
 
     Transactions transaction = new Transactions();
-    transaction.setId(generateTxnId());
+    transaction.setTxnId(generateTxnId());
     transaction.setChannel(txnRequest.getChannel());
     transaction.setData(txnRequest.getData());
     transaction.setDescription(
@@ -459,7 +422,6 @@ public class TxnServiceImpl implements TxnService {
     transaction.setReferenceId(txnRequest.getReferenceId());
     transaction.setTag(txnRequest.getTag());
     transaction.setTxnTime(Instant.now());
-
     transaction.setCreatedBy(txnRequest.getMaker() + "-" + txnRequest.getChecker());
     transaction.setCreatedOn(Instant.now());
     return transactionRepository.save(transaction);
@@ -467,7 +429,6 @@ public class TxnServiceImpl implements TxnService {
 
   private List<MemberAcEntries> generateMemberAcEntries(Account account, Account remoteAc, TransactionType type, BigDecimal amount,
                                                         Transactions transaction, boolean isCredit) {
-
     MemberAcEntries memberAcEntries = new MemberAcEntries();
     memberAcEntries.setTxnTime(transaction.getTxnTime());
     memberAcEntries.setAmount(isCredit ? amount : amount.negate());
@@ -475,8 +436,6 @@ public class TxnServiceImpl implements TxnService {
     memberAcEntries.setRemoteAccount(remoteAc);
     memberAcEntries.setTransaction(transaction);
     memberAcEntries.setTxnType(type);
-
-    //todo generate sub transaction from type
     List<MemberAcEntries> memberAcEntriesList = new ArrayList<>();
     memberAcEntriesList.add(memberAcEntries);
     return memberAcEntriesList;
@@ -486,14 +445,11 @@ public class TxnServiceImpl implements TxnService {
                                                         Transactions transaction, boolean isCredit) {
     LedgerAcEntries ledgerAcEntries = new LedgerAcEntries();
     ledgerAcEntries.setTxnTime(transaction.getTxnTime());
-
     ledgerAcEntries.setAmount(isCredit ? amount : amount.negate());
     ledgerAcEntries.setAccount(account);
     ledgerAcEntries.setRemoteAccount(remoteAc);
     ledgerAcEntries.setTransaction(transaction);
     ledgerAcEntries.setTxnType(type);
-
-    //todo generate sub transaction from type
     List<LedgerAcEntries> ledgerAcEntriesList = new ArrayList<>();
     ledgerAcEntriesList.add(ledgerAcEntries);
     return ledgerAcEntriesList;
@@ -516,7 +472,6 @@ public class TxnServiceImpl implements TxnService {
   }
 
   private String generateTxnId() {
-    //todo pre generated txn ID
     return UUID.randomUUID().toString().replace("-", "").toUpperCase().substring(0, 10);
   }
 
@@ -533,7 +488,7 @@ public class TxnServiceImpl implements TxnService {
     if (to.getLedger().getType() == LedgerType.MEMBER) {
       txnResponse.setToBalance(to.getBalance());
     }
-    txnResponse.setTxnId(transaction.getId());
+    txnResponse.setTxnId(transaction.getTxnId());
     return txnResponse;
 
   }
@@ -586,7 +541,6 @@ public class TxnServiceImpl implements TxnService {
       Account account = rMemberEntry.getAccount();
       boolean debit = rMemberEntry.getAmount().compareTo(BigDecimal.ZERO) < 0;
       lockAcForReverse(account, debit);
-      //check balance from member
       if (debit) {
         validateBalance(account, rMemberEntry.getAmount());
       }
@@ -594,7 +548,7 @@ public class TxnServiceImpl implements TxnService {
     }
     TxnResponse txnResponse = new TxnResponse();
     txnResponse.setStatus(Constants.STATUS_PROCESSED);
-    txnResponse.setTxnId(reversTransaction.getId());
+    txnResponse.setTxnId(reversTransaction.getTxnId());
     return txnResponse;
   }
 
@@ -602,11 +556,9 @@ public class TxnServiceImpl implements TxnService {
     if (debit && account.getLedger().getType() == LedgerType.MEMBER) {
       acLockRepository.findByAccountId(account.getId());
     }
-
     if (debit && account.getLedger().getType() == LedgerType.MEMBER) {
       acLockRepository.findByAccountId(account.getId());
     }
-
     if (!debit && account.getLedger().getType() == LedgerType.MEMBER) {
       acLockRepository.findByAccountId(account.getId());
     }
@@ -650,9 +602,8 @@ public class TxnServiceImpl implements TxnService {
     reversTransaction.setChannel(reversTransaction.getChannel());
     reversTransaction.setNote(reverseRequest.getNote());
     reversTransaction.setData(reverseRequest.getData());
-    reversTransaction.setId(this.generateTxnId());
+    reversTransaction.setTxnId(this.generateTxnId());
     reversTransaction.setReferenceId(reverseRequest.getTxnId());
     return reversTransaction;
   }
-
 }

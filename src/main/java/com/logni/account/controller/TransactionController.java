@@ -24,14 +24,14 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 public class TransactionController {
 
     @Autowired
     TxnService txnService;
 
     @Operation(summary = "Perform all type of transaction and refund transaction", description = "", tags={ "transaction" })
-    @PostMapping(path = "/txn")
+    @PostMapping(path = "/v1/txn")
     ResponseEntity<TxnResponse> doTxn(@RequestBody @Valid TxnRequest txnRequest){
         log.info("Req: {} TO: {} Amount: {}| Type:{}",txnRequest.getToAc(),txnRequest.getAmount(),txnRequest.getTransactionType().getTxnCode(),txnRequest.getFromAc());
         long s = System.currentTimeMillis();
@@ -41,7 +41,7 @@ public class TransactionController {
     }
 
     @Operation(summary = "Perform bulk transaction", description = "", tags={ "transaction" })
-    @PostMapping(path = "/bulk/txn")
+    @PostMapping(path = "/v1/bulk/txn")
     ResponseEntity<TxnResponse> doBulkTxn(@RequestBody @Valid BulkTxnRequest bulkTxnRequest){
         log.info("Bulk Txn Req: ");
         long s = System.currentTimeMillis();
@@ -51,7 +51,7 @@ public class TransactionController {
     }
 
     @Operation(summary = "Perform Journal Entries", description = "", tags={ "transaction" })
-    @PostMapping(path = "/journal")
+    @PostMapping(path = "/v1/journal")
     ResponseEntity<TxnResponse> doBulkJournal(@RequestBody @Valid JournalRequest journalRequest){
         log.info("Journal Request");
         long s = System.currentTimeMillis();
@@ -60,25 +60,18 @@ public class TransactionController {
         return ResponseEntity.ok(txnResponse);
     }
 
-    //todo get txn Details(for Txn id)
     @Operation(summary = "Transaction detail", description = "", tags={ "transaction" })
-    @GetMapping(path = "/txn/{txnId}")
+    @GetMapping(path = "/v1/txn/{txnId}")
     ResponseEntity<TxnDetail> txnDetail(@PathVariable("txnId") String txnId){
          return ResponseEntity.ok(txnService.getTxnDetail(txnId));
     }
 
 
     @Operation(summary = "Txn Reverse By BackOffice User", description = "", tags={ "transaction" })
-    @PostMapping(path = "/reverse")
+    @PostMapping(path = "/v1/reverse")
     ResponseEntity<TxnResponse> txnReverse(@RequestBody @Valid BaseReverseRequest reverseRequest){
         TxnResponse txnResponse = txnService.doReverseTxn(reverseRequest);
         return ResponseEntity.ok(txnResponse);
     }
-// todo internal reverse auto
-//    @Operation(summary = "Txn Auto Reverse", description = "", tags={ "transaction" })
-//    @PostMapping(path = "/reverse/auto")
-//    ResponseEntity<TxnResponse> reverseAuto(@RequestBody @Valid TxnRequest txnRequest){
-//
-//    }
 
 }

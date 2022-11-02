@@ -80,19 +80,16 @@ public class LedgerServiceImpl implements LedgerService {
 
     public List<LedgerBalanceDto> getLedgerBalance( List<Ledger> ledgerList ,Instant time ){
         List<LedgerBalanceDto> ledgerBalanceDtos = new ArrayList<>();
-
         ledgerList.forEach(ledger -> {
             BigDecimal balance = BigDecimal.ZERO;
             if(!ledger.getOnlyParent()){
                 LedgerBalanceArchive balanceArchive = ledgerBalanceArchiveRepo.findByLedgerAndBalanceAt(ledger,time);
-
                 if(ledger.getType()==LedgerType.SYSTEM){
                     if(balanceArchive!=null){
                         balance = balanceArchive.getBalance();
                     }else {
                         balance= accountService.getLedgerBalance(ledger,time);
                     }
-
                 }else {
                     if(balanceArchive!=null){
                         balance = balanceArchive.getBalance();
@@ -105,7 +102,6 @@ public class LedgerServiceImpl implements LedgerService {
                 }
             }
             ledgerBalanceDtos.add(adaptLedgerDto(ledger,balance,time));
-
         });
         return ledgerBalanceDtos;
     }
@@ -120,7 +116,6 @@ public class LedgerServiceImpl implements LedgerService {
     }
 
     private LedgerBalanceDto adaptLedgerDto(Ledger ledger,BigDecimal balance, Instant time){
-
         LedgerBalanceDto ledgerBalanceDto = new LedgerBalanceDto();
         ledgerBalanceDto.setBalance(balance);
         ledgerBalanceDto.setBalanceAt(time);
@@ -129,8 +124,9 @@ public class LedgerServiceImpl implements LedgerService {
         ledgerBalanceDto.setOnlyParent(ledger.getOnlyParent());
         ledgerBalanceDto.setType(ledger.getType());
         ledgerBalanceDto.setName(ledger.getName());
-        if(ledger.getParentLedger()!=null)
+        if(ledger.getParentLedger()!=null){
             ledgerBalanceDto.setParentLedgerDto(adaptLedgerDto(ledger.getParentLedger(),BigDecimal.ZERO,time));
+        }
         return ledgerBalanceDto;
     }
 }

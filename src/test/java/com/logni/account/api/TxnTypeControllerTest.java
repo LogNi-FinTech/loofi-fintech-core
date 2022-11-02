@@ -32,7 +32,6 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-//@TestMethodOrder(OrderAnnotation.class)
 public class TxnTypeControllerTest  {
 
 

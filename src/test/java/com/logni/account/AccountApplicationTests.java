@@ -45,7 +45,6 @@ class AccountApplicationTests {
 		LedgerControllerTest ld = new LedgerControllerTest(this.baseUrl);
 		ld.setUpLedger();
 		ld.checkFirstLedger();
-
 	}
 
 	@Test

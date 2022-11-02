@@ -28,6 +28,7 @@ import com.logni.account.utils.Constants;
 
 import javax.annotation.Resource;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,31 +50,16 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
-
-  @Autowired
-  public LedgerRepository ledgerRepository;
-
-  @Autowired
-  public AccountRepository accountRepository;
-
-  @Autowired
-  public AcLockRepository acLockRepository;
-
-  @Autowired
-  public AcBalanceStateRepository acBalanceStateRepository;
-
-  @Autowired
-  public MemberAcEntriesRepository memberAcEntriesRepository;
-
-  @Autowired
-  public LedgerAcEntriesRepository ledgerAcEntriesRepository;
-
-  @Autowired
-  public AcConfigRepository acConfigRepository;
-
-  @Autowired
-  public MemberLedgerBalanceStateRepo memberLedgerBalanceStateRepo;
+  private final LedgerRepository ledgerRepository;
+  private final AccountRepository accountRepository;
+  private final AcLockRepository acLockRepository;
+  private final AcBalanceStateRepository acBalanceStateRepository;
+  private final MemberAcEntriesRepository memberAcEntriesRepository;
+  private final LedgerAcEntriesRepository ledgerAcEntriesRepository;
+  private final AcConfigRepository acConfigRepository;
+  private final MemberLedgerBalanceStateRepo memberLedgerBalanceStateRepo;
 
   @Resource(name = "requestScopeTokenData")
   private UserData userData;
@@ -98,7 +84,6 @@ public class AccountServiceImpl implements AccountService {
     } else {
       account.setState(AccountState.ACTIVE);
     }
-
     account.setCreatedBy(userData.getUserId() != null ? userData.getUserId() : "REST");
     setOptionalField(accountDto, account);
     Account accountDb = accountRepository.save(account);
@@ -111,7 +96,6 @@ public class AccountServiceImpl implements AccountService {
   }
 
   public void createCustomerAccount(CustomerAcDTO customerAcDTO) {
-    //todo do it cache
     Optional<AccountConfig> accountConfigOp = acConfigRepository.findById(Constants.CUSTOMER_LEDGER_ID);
     if (!accountConfigOp.isPresent()) {
       throw new AccountCreationExp("NO MAPPING FOR CUSTOMER LEDGER");
@@ -138,7 +122,6 @@ public class AccountServiceImpl implements AccountService {
   }
 
   public Account getAccountByIdentifier(String identifier) {
-    //todo cache here
     return accountRepository.findByIdentifier(identifier);
   }
 
@@ -163,7 +146,6 @@ public class AccountServiceImpl implements AccountService {
       account.setLastModifiedDate(Instant.now());
       account.setLastModifiedBy("TODO-MAKER");
       account.setActivationDate(Instant.now());
-      //todo history of activation
     } else {
       throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_MANAGEMENT, AccountErrors.INVALID_ACCOUNT),
         AccountErrors.ERROR_MAP.get(AccountErrors.INVALID_ACCOUNT));
@@ -174,17 +156,13 @@ public class AccountServiceImpl implements AccountService {
   public void closeAccount(AcCloseDto acCloseDto) {
     Account account = accountRepository.findByIdentifier(acCloseDto.getIdentifier());
     accountNotFoundCheck(account);
-    //todo implement all close business logic
     if (account.getState() != AccountState.CLOSE) {
       account.setState(AccountState.CLOSE);
       account.setLastModifiedDate(Instant.now());
       account.setLastModifiedBy("TODO-MAKER");
-
-      // todo history of close
     } else {
       throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_MANAGEMENT, AccountErrors.INVALID_ACCOUNT),
         AccountErrors.ERROR_MAP.get(AccountErrors.INVALID_ACCOUNT));
-
     }
 
   }
@@ -192,14 +170,10 @@ public class AccountServiceImpl implements AccountService {
   public AccountDto updateAccount(AccountDto accountDto) {
     Account account = accountRepository.findByIdentifier(accountDto.getIdentifier());
     accountNotFoundCheck(account);
-    //todo implement all close business logic
-
     account.setName(accountDto.getName());
     account.setState(accountDto.getState());
     account.setLastModifiedDate(Instant.now());
     account.setLastModifiedBy("TODO-MAKER");
-    // todo history of close
-
     return accountDto;
   }
 
@@ -211,7 +185,6 @@ public class AccountServiceImpl implements AccountService {
 
   @Transactional(readOnly = true)
   public List<AccountDto> getAccountByCustomerId(String customerId) {
-
     List<Account> accountList = accountRepository.findAllByCustomerId(customerId);
     accountNotFoundCheck(accountList);
     return accountList.stream().map(ac -> AccountUtil.map(ac, AccountDto.class).orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
@@ -231,7 +204,6 @@ public class AccountServiceImpl implements AccountService {
 
   @Transactional(readOnly = true)
   public Page<StmtTxn> accountStatement(String identifier, Pageable pageable) {
-
     Account account = accountRepository.findByIdentifier(identifier);
     accountNotFoundCheck(account);
     checkMemberAc(account);
@@ -271,7 +243,7 @@ public class AccountServiceImpl implements AccountService {
     if (e instanceof MemberAcEntries) {
       stmtTxn = new StmtTxn();
       MemberAcEntries me = (MemberAcEntries) e;
-      stmtTxn.setTxnId(me.getTransaction().getId());
+      stmtTxn.setTxnId(me.getTransaction().getTxnId());
       stmtTxn.setAmount(me.getAmount());
       stmtTxn.setDescription(me.getTransaction().getDescription());
       stmtTxn.setNote(me.getTransaction().getNote());
@@ -285,7 +257,7 @@ public class AccountServiceImpl implements AccountService {
     } else if (e instanceof LedgerAcEntries) {
       LedgerAcEntries le = (LedgerAcEntries) e;
       stmtTxn = new StmtTxn();
-      stmtTxn.setTxnId(le.getTransaction().getId());
+      stmtTxn.setTxnId(le.getTransaction().getTxnId());
       stmtTxn.setAmount(le.getAmount());
       stmtTxn.setDescription(le.getTransaction().getDescription());
       stmtTxn.setNote(le.getTransaction().getNote());
@@ -299,22 +271,6 @@ public class AccountServiceImpl implements AccountService {
 
     return stmtTxn;
   }
-
-    /*
-    private StmtTxn adaptStatement(LedgerAcEntries le){
-        StmtTxn stmtTxn = new StmtTxn();
-        stmtTxn.setTxnId(le.getTransaction().getId());
-        stmtTxn.setAmount(le.getAmount());
-        stmtTxn.setDescription(le.getTransaction().getDescription());
-        stmtTxn.setNote(le.getTransaction().getNote());
-        stmtTxn.setChannel(le.getTransaction().getChannel());
-        stmtTxn.setRemoteAccount(le.getRemoteAccount().getIdentifier());
-        stmtTxn.setTxnType(le.getTxnType().getName());
-        stmtTxn.setData(le.getTransaction().getData()!=null?le.getTransaction().getData().toString():null);
-        stmtTxn.setTxnTime(le.getTxnTime());
-        return stmtTxn;
-    }
-    */
 
   @Transactional(readOnly = true)
   public AcBalance getLedgerBalance(String ledgerCode) {
@@ -340,7 +296,6 @@ public class AccountServiceImpl implements AccountService {
     if (time == null) {
       time = Instant.now();
     }
-
     BigDecimal balance;
     AccountBalanceState lastBalanceState = acBalanceStateRepository.findTopByAccountOrderByBalanceAtDesc(ledger.getSystemAccount());
     BigDecimal balanceDiff;
@@ -386,7 +341,6 @@ public class AccountServiceImpl implements AccountService {
     Account account = accountRepository.findByIdentifier(ledgerCode);
     accountNotFoundCheck(account);
     checkSystemAc(account);
-
     Page<LedgerAcEntries> ledgerAcEntries = ledgerAcEntriesRepository.findAllByAccount(account, pageable);
     if (ledgerAcEntries == null) {
       return new PageImpl<>(new ArrayList<>(), pageable, 0);
