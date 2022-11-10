@@ -40,6 +40,8 @@ LogNi Core Engine can be used in the following domain -
 - Code Formatting and clean code
 - MySQL & Oracle implementation
 - Add new features
+- add unit and integration test
+- implement CI in git action
 - Sonarlint & code quality check
 
 # Contact:
