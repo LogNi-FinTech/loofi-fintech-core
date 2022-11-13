@@ -30,12 +30,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,7 +152,7 @@ public class TxnServiceImpl implements TxnService {
     journalRequest.getCreditors().forEach(txnLine -> {
       totalCreditAmount.add(txnLine.getAmount());
     });
-    if (!totalCreditAmount.equals(totalDebitAmount)) {
+    if (totalCreditAmount.subtract(totalDebitAmount).abs().doubleValue()>0.0001) {
       throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION, AccountErrors.INVALID_AMOUNT),
         AccountErrors.ERROR_MAP.get(AccountErrors.INVALID_AMOUNT));
     }
@@ -201,8 +199,8 @@ public class TxnServiceImpl implements TxnService {
     log.info("Txn Request:{}", txnRequest);
     txnValidator.validate(txnRequest);
     TransactionType transactionType = txnTypeService.getTxnType(txnRequest.getTransactionType());
-    Account from = null;
-    Account to = null;
+    Account from ;
+    Account to;
     if (Constants.SYSTEM.equalsIgnoreCase(txnRequest.getFromAc())) {
       from = transactionType.getFromType().getSystemAccount();
     } else {
@@ -458,7 +456,7 @@ public class TxnServiceImpl implements TxnService {
   private void validateBalance(Account from, BigDecimal amount) {
     if (from.getLedger().getType() == LedgerType.MEMBER) {
       BigDecimal lowCredit = from.getLowerLimit();
-      BigDecimal fromBalance = null;
+      BigDecimal fromBalance;
       if (lowCredit == null) {
         lowCredit = BigDecimal.ZERO;
       }
@@ -495,7 +493,7 @@ public class TxnServiceImpl implements TxnService {
 
   @Transactional(readOnly = true)
   public TxnDetail getTxnDetail(String txnId) {
-    Optional<Transactions> transactionsOptional = transactionRepository.findById(txnId);
+    Optional<Transactions> transactionsOptional = transactionRepository.findByTxnId(txnId);
     transactionsOptional.orElseThrow(
       () -> new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION, AccountErrors.TRANSACTION_NOT_FOUND),
         String.format(AccountErrors.ERROR_MAP.get(AccountErrors.TRANSACTION_NOT_FOUND), txnId)));
@@ -507,9 +505,9 @@ public class TxnServiceImpl implements TxnService {
     }
     TxnDetail txnDetail = new TxnDetail();
     BeanUtils.copyProperties(transactionsOptional.get(), txnDetail); //MODEL_MAPPER.map(transactionsOptional.get(),TxnDetail.class);
-    List<StmtTxn> stmtTxnList = memberEntries.stream().map(me -> accountService.adaptStatement(me)).collect(Collectors.toList());
+    List<StmtTxn> stmtTxnList = memberEntries.stream().map(accountService::adaptStatement).collect(Collectors.toList());
     if (ledgerAcEntries != null && !ledgerAcEntries.isEmpty()) {
-      stmtTxnList.addAll(ledgerAcEntries.stream().map(le -> accountService.adaptStatement(le)).collect(Collectors.toList()));
+      stmtTxnList.addAll(ledgerAcEntries.stream().map(accountService::adaptStatement).collect(Collectors.toList()));
     }
     txnDetail.setLedgerEntries(stmtTxnList);
     return txnDetail;
@@ -517,18 +515,19 @@ public class TxnServiceImpl implements TxnService {
 
   @Transactional(rollbackFor = Exception.class)
   public TxnResponse doReverseTxn(BaseReverseRequest reverseRequest) {
-    Optional<Transactions> transactionsOptional = transactionRepository.findById(reverseRequest.getTxnId());
+    Optional<Transactions> transactionsOptional = transactionRepository.findByTxnId(reverseRequest.getTxnId());
     transactionsOptional.orElseThrow(
       () -> new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION, AccountErrors.TRANSACTION_NOT_FOUND),
         String.format(AccountErrors.ERROR_MAP.get(AccountErrors.TRANSACTION_NOT_FOUND), reverseRequest.getTxnId())));
 
     List<MemberAcEntries> memberEntries = memberAcEntriesRepository.findAllByTransaction(transactionsOptional.get());
-    BigDecimal sum = memberEntries.stream().map(MemberAcEntries::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-    List<LedgerAcEntries> ledgerAcEntries = null;
-    if (BigDecimal.ZERO.compareTo(sum) != 0) {
-      ledgerAcEntries = ledgerAcEntriesRepository.findAllByTransaction(transactionsOptional.get());
-    }
+    List<LedgerAcEntries> ledgerAcEntries;
+    ledgerAcEntries = ledgerAcEntriesRepository.findAllByTransaction(transactionsOptional.get());
     Transactions originalTransaction = transactionsOptional.get();
+    if (Constants.REVERSE_ORIGINAL_TAG.equalsIgnoreCase(originalTransaction.getTag())) {
+      throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION, AccountErrors.TRANSACTION_ALREADY_REVERSED),
+        AccountErrors.ERROR_MAP.get(AccountErrors.TRANSACTION_ALREADY_REVERSED));
+    }
     originalTransaction.setTag(Constants.REVERSE_ORIGINAL_TAG);
     Transactions reversTransaction = getTransactionsForReverse(reverseRequest);
     reversTransaction = transactionRepository.save(reversTransaction);
@@ -540,26 +539,22 @@ public class TxnServiceImpl implements TxnService {
     for (MemberAcEntries rMemberEntry : rMemberEntries) {
       Account account = rMemberEntry.getAccount();
       boolean debit = rMemberEntry.getAmount().compareTo(BigDecimal.ZERO) < 0;
-      lockAcForReverse(account, debit);
+      lockAcForReverse(account);
       if (debit) {
         validateBalance(account, rMemberEntry.getAmount());
       }
       updateMemberBalance(rMemberEntry, reversTransaction);
     }
+    memberAcEntriesRepository.saveAll(rMemberEntries);
+    ledgerAcEntriesRepository.saveAll(rLedgerAcEntries);
     TxnResponse txnResponse = new TxnResponse();
     txnResponse.setStatus(Constants.STATUS_PROCESSED);
     txnResponse.setTxnId(reversTransaction.getTxnId());
     return txnResponse;
   }
 
-  private void lockAcForReverse(Account account, boolean debit) {
-    if (debit && account.getLedger().getType() == LedgerType.MEMBER) {
-      acLockRepository.findByAccountId(account.getId());
-    }
-    if (debit && account.getLedger().getType() == LedgerType.MEMBER) {
-      acLockRepository.findByAccountId(account.getId());
-    }
-    if (!debit && account.getLedger().getType() == LedgerType.MEMBER) {
+  private void lockAcForReverse(Account account) {
+    if (account.getLedger().getType() == LedgerType.MEMBER) {
       acLockRepository.findByAccountId(account.getId());
     }
   }

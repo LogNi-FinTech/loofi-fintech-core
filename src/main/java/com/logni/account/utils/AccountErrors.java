@@ -40,9 +40,10 @@ public class AccountErrors {
     public static final String MINIMUM_AMOUNT_EXCEEDED = "019";
     public static final String BALANCE_INTEGRITY_ERROR = "020";
     public static final String TRANSACTION_NOT_FOUND = "021";
+    public static final String TRANSACTION_ALREADY_REVERSED = "022";
 
     // Error mapping
-    public static final Map<String, String> ERROR_MAP = new HashMap<String, String>();
+    public static final Map<String, String> ERROR_MAP = new HashMap<>();
 
     static {
         ERROR_MAP.put(INVALID_ACCOUNT, "Invalid Account");
@@ -65,6 +66,7 @@ public class AccountErrors {
         ERROR_MAP.put(MINIMUM_AMOUNT_EXCEEDED, "MINIMUM_AMOUNT_EXCEEDED");
         ERROR_MAP.put(BALANCE_INTEGRITY_ERROR, "BALANCE_INTEGRITY_ERROR:AC ID %s");
         ERROR_MAP.put(TRANSACTION_NOT_FOUND, "TRANSACTION_DETAIL_NOT_FOUND: ID %s");
+        ERROR_MAP.put(TRANSACTION_ALREADY_REVERSED, "TRANSACTION_ALREADY_REVERSED");
     }
 
     public static String getErrorCode(String featureCode,String errorCode){

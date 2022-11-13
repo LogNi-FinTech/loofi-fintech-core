@@ -6,7 +6,6 @@ import com.logni.account.dto.rest.transaction.JournalRequest;
 import com.logni.account.dto.rest.transaction.TxnDetail;
 import com.logni.account.dto.rest.transaction.TxnRequest;
 import com.logni.account.dto.rest.transaction.TxnResponse;
-import com.logni.account.entities.transactions.Transactions;
 import com.logni.account.service.transaction.TxnService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -50,7 +48,7 @@ public class TransactionController {
         return ResponseEntity.ok(txnResponse);
     }
 
-    @Operation(summary = "Perform Journal Entries", description = "", tags={ "transaction" })
+    @Operation(summary = "Perform Journal Entries",  tags={ "transaction" })
     @PostMapping(path = "/v1/journal")
     ResponseEntity<TxnResponse> doBulkJournal(@RequestBody @Valid JournalRequest journalRequest){
         log.info("Journal Request");
@@ -65,7 +63,6 @@ public class TransactionController {
     ResponseEntity<TxnDetail> txnDetail(@PathVariable("txnId") String txnId){
          return ResponseEntity.ok(txnService.getTxnDetail(txnId));
     }
-
 
     @Operation(summary = "Txn Reverse By BackOffice User", description = "", tags={ "transaction" })
     @PostMapping(path = "/v1/reverse")

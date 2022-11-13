@@ -6,11 +6,8 @@ import com.logni.account.entities.transactions.TransactionType;
 import com.logni.account.entities.transactions.TxnFee;
 import com.logni.account.repository.transaction.TxnFeeRepository;
 import com.logni.account.repository.transaction.TxnTypeRepository;
-
 import java.util.Optional;
-
 import javax.annotation.Resource;
-import javax.swing.text.html.Option;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -88,7 +84,7 @@ public class TxnTypeController {
   @PostMapping("/v1/txn/type/sub")
   @Transactional
   public ResponseEntity createTxnFee(@RequestBody @Valid TxnFee txnFee) {
-    txnFee.setCreatedBy("REST"); 
+    txnFee.setCreatedBy("REST");
     txnFeeRepository.save(txnFee);
     return ResponseEntity.ok().body("");
   }
