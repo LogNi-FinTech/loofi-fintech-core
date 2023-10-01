@@ -47,7 +47,9 @@ LogNi Core Engine can be used in the following domain -
 # Contact:
 - Slack Group:
 - FaceBook: 
-- LinkedIn : https://www.linkedin.com/groups/14134418/
+- LinkedIn :
+    - https://www.linkedin.com/groups/14134418
+    - https://www.linkedin.com/company/90690030
 - Email: lognifintech@gmail.com
 
 
