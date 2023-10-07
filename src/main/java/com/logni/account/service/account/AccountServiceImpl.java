@@ -199,7 +199,8 @@ public class AccountServiceImpl implements AccountService {
     checkMemberAc(account);
     BigDecimal balance;
     balance = account.getBalance();
-    return new AcBalance(account.getIdentifier(), balance);
+    // todo need ot implement available balance, maintain pending and rejected ledger table
+    return new AcBalance(account.getIdentifier(), balance, balance);
   }
 
   @Transactional(readOnly = true)
@@ -287,7 +288,7 @@ public class AccountServiceImpl implements AccountService {
     }
     balanceDiff = (balanceDiff == null) ? BigDecimal.ZERO : balanceDiff;
     balance = (lastBalanceState == null) ? balanceDiff : lastBalanceState.getBalance().add(balanceDiff);
-    return new AcBalance(account.getIdentifier(), balance);
+    return new AcBalance(account.getIdentifier(), balance, balance);
 
   }
 

@@ -14,4 +14,5 @@ import java.math.BigDecimal;
 public class AcBalance {
     String identifier;
     BigDecimal balance;
+    BigDecimal availableBalance;
 }
