@@ -18,7 +18,6 @@ public class AcceptanceTest {
     private RestTemplate restTemplate;
     private String baseUrl;
 
-
     @BeforeEach
     void setUp() {
         restTemplate = new RestTemplate();

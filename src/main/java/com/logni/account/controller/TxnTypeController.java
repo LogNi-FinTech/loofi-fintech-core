@@ -6,7 +6,9 @@ import com.logni.account.entities.transactions.TransactionType;
 import com.logni.account.entities.transactions.TxnFee;
 import com.logni.account.repository.transaction.TxnFeeRepository;
 import com.logni.account.repository.transaction.TxnTypeRepository;
+
 import java.util.Optional;
+
 import javax.annotation.Resource;
 
 import lombok.RequiredArgsConstructor;
@@ -89,7 +91,7 @@ public class TxnTypeController {
 
   @GetMapping("/v1/txn/type/sub")
   @Transactional(readOnly = true)
-  ResponseEntity<Page<TxnFee>> feeList(Pageable pageable) {
+  public ResponseEntity<Page<TxnFee>> feeList(Pageable pageable) {
     return ResponseEntity.ok().body(txnFeeRepository.findAll(pageable));
   }
 

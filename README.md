@@ -1,13 +1,10 @@
-# LoogNi-fintech-core
-Open Source Cloud Native FinTech Core Platform.(Community Edition).
-Core ledger &amp; balance and transaction system for holding, receiving &amp; sending money.
+# LooFi-fintech-core
+Open Source Cloud Native FinTech Core Platform (Community Edition).
+Core ledger &amp; balance and transaction system for holding, receiving &amp; transacting money.
 
-Anyone can explore, contribute and distribute this source code. 
+Technology: Java 11, Spring Boot, Postgres
 
-Technology: Spring Boot, Postgres
-
-LogNi Core Engine can be used in the following domain - 
-- Bank
+LogNi Core Engine can be used in the following domain -
 - FinTech 
 - MFI/MFS
 - Mobile Banking
@@ -21,7 +18,7 @@ LogNi Core Engine can be used in the following domain -
 - Lending Platform
 - Investment Platform
 - Payment Processor
-- Any tech company who want to receive, store and disburse e-money
+- Any tech company who want to receive, store and transact e-money
 
 
 # Contribution guideline
@@ -31,20 +28,16 @@ LogNi Core Engine can be used in the following domain -
 
 # Anyone can contribute following areas:
 
-- API Documentation
 - Documentation
-- Security 
-- Authentication Service/module
-- Code Formatting and clean code
+- Security Implementation
+- Refactor code
 - Add new features
-- add unit and integration test
+- More unit and integration test
 - Sonarlint & code quality check
+- Upgrade dependency
 
 # Contact:
-- Slack Group:
-- FaceBook: 
 - LinkedIn :
-    - https://www.linkedin.com/groups/14134418
     - https://www.linkedin.com/company/90690030
 - Email: lognifintech@gmail.com
 
