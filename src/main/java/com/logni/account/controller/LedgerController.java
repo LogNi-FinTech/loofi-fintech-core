@@ -56,7 +56,6 @@ public class LedgerController {
   @Operation(summary = "Get Ledger Info.", tags = {"ledger"})
   @GetMapping("/v1/ledger/{id}")
   public ResponseEntity<Ledger> getLedger(@PathVariable("id") Long id) {
-
     Optional<Ledger> ledgerOptional = ledgerRepository.findById(id);
     return ledgerOptional.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }

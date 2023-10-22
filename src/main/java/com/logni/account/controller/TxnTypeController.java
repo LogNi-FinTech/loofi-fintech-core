@@ -9,6 +9,7 @@ import com.logni.account.repository.transaction.TxnTypeRepository;
 import java.util.Optional;
 import javax.annotation.Resource;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,10 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class TxnTypeController {
-
-  @Autowired
-  TxnTypeRepository txnTypeRepository;
-
-  @Autowired
-  TxnFeeRepository txnFeeRepository;
+  private final TxnTypeRepository txnTypeRepository;
+  private final TxnFeeRepository txnFeeRepository;
 
   @Resource(name = "requestScopeTokenData")
   private UserData userData;

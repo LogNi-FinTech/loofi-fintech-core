@@ -12,9 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "ledger_account_balance_state",indexes = {@Index(name = "idx_balance_at",columnList = "balance_at")})
-public class AccountBalanceState { // every ac must have at least one entry here.
-    // maintain history table. for storing old data.
-
+public class AccountBalanceState {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -28,7 +26,6 @@ public class AccountBalanceState { // every ac must have at least one entry here
 
     @Column(name = "balance_at")
     private Instant balanceAt;
-
 
     @Column(name = "created_on")
     private Instant createdOn;

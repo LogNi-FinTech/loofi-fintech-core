@@ -10,12 +10,7 @@ public class HomeController {
 
     @GetMapping("/")
     public @ResponseBody  String home(){
-        return "Hello LoogNi Core Wallet/Account";
+        return "Welcome to LooFi FinTech Core Wallet/Account";
     }
 
-
-    @GetMapping("/docs")
-    public String apiDoc(){
-        return  "redirect:/v3/api-docs";
-    }
 }

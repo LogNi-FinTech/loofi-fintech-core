@@ -10,7 +10,6 @@ import com.logni.account.dto.rest.transaction.TxnResponse;
 public interface TxnService {
     TxnResponse doTxn(TxnRequest txnRequest);
     TxnResponse doBulkTxn(BulkTxnRequest bulkTxnRequest);
-
     TxnResponse doJournalTxn(JournalRequest journalRequest);
     TxnDetail getTxnDetail(String txnId);
     TxnResponse doReverseTxn(BaseReverseRequest reverseRequest);

@@ -152,7 +152,7 @@ public class TxnServiceImpl implements TxnService {
     journalRequest.getCreditors().forEach(txnLine -> {
       totalCreditAmount.add(txnLine.getAmount());
     });
-    if (totalCreditAmount.subtract(totalDebitAmount).abs().doubleValue()>0.0001) {
+    if (totalCreditAmount.subtract(totalDebitAmount).abs().doubleValue() > 0.0001) {
       throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_TRANSACTION, AccountErrors.INVALID_AMOUNT),
         AccountErrors.ERROR_MAP.get(AccountErrors.INVALID_AMOUNT));
     }
@@ -199,7 +199,7 @@ public class TxnServiceImpl implements TxnService {
     log.info("Txn Request:{}", txnRequest);
     txnValidator.validate(txnRequest);
     TransactionType transactionType = txnTypeService.getTxnType(txnRequest.getTransactionType());
-    Account from ;
+    Account from;
     Account to;
     if (Constants.SYSTEM.equalsIgnoreCase(txnRequest.getFromAc())) {
       from = transactionType.getFromType().getSystemAccount();
@@ -407,7 +407,6 @@ public class TxnServiceImpl implements TxnService {
   }
 
   private Transactions generateTxn(TransactionType type, TxnRequest txnRequest) {
-
     Transactions transaction = new Transactions();
     transaction.setTxnId(generateTxnId());
     transaction.setChannel(txnRequest.getChannel());

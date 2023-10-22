@@ -8,7 +8,7 @@ Technology: Spring Boot, Postgres
 
 LogNi Core Engine can be used in the following domain - 
 - Bank
-- FinTech
+- FinTech 
 - MFI/MFS
 - Mobile Banking
 - e-Wallet
@@ -17,14 +17,12 @@ LogNi Core Engine can be used in the following domain -
 - WealthTech
 - Digital Banking
 - Neo Banking
-- Open Banking
 - Payment Platform
 - Lending Platform
 - Investment Platform
 - Payment Processor
 - Any tech company who want to receive, store and disburse e-money
-- Embedded finance
-- BaaS (Bank as a Service)
+
 
 # Contribution guideline
 - fork the repo
@@ -38,10 +36,8 @@ LogNi Core Engine can be used in the following domain -
 - Security 
 - Authentication Service/module
 - Code Formatting and clean code
-- MySQL & Oracle implementation
 - Add new features
 - add unit and integration test
-- implement CI in git action
 - Sonarlint & code quality check
 
 # Contact:

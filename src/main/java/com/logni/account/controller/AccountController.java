@@ -9,6 +9,7 @@ import com.logni.account.dto.rest.account.StmtTxn;
 import com.logni.account.service.account.AccountService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,10 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class AccountController {
 
-  @Autowired
-  AccountService accountService;
+  private final AccountService accountService;
 
   @Operation(summary = "Create Account", description = "", tags = {"account"})
   @PostMapping("/v1/account")
@@ -60,7 +61,6 @@ public class AccountController {
   @GetMapping("/v1/account/customer/{customerId}")
   public ResponseEntity<List<AccountDto>> getAccountsByCustomerId(@PathVariable("customerId") String customerId) {
     return ResponseEntity.ok(accountService.getAccountByCustomerId(customerId));
-
   }
 
   @Operation(summary = "Account Balance.", description = "", tags = {"account"})
@@ -71,7 +71,6 @@ public class AccountController {
     AcBalance acBalance = accountService.getAccountBalance(identifier);
     log.info("AC Balance Response.Latency: {} ms", (System.currentTimeMillis() - s));
     return ResponseEntity.ok(acBalance);
-
   }
 
   @Operation(summary = "Account Statement.", description = "", tags = {"account"})
@@ -100,7 +99,6 @@ public class AccountController {
   public ResponseEntity<AccountDto> updateAccount(@RequestBody AccountDto accountDto) {
     return ResponseEntity.ok(accountService.updateAccount(accountDto));
   }
-
 
 }
 

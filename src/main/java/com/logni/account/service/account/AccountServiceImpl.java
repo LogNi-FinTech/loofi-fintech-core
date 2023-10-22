@@ -97,7 +97,7 @@ public class AccountServiceImpl implements AccountService {
 
   public void createCustomerAccount(CustomerAcDTO customerAcDTO) {
     Optional<AccountConfig> accountConfigOp = acConfigRepository.findById(Constants.CUSTOMER_LEDGER_ID);
-    if (!accountConfigOp.isPresent()) {
+    if (accountConfigOp.isEmpty()) {
       throw new AccountCreationExp("NO MAPPING FOR CUSTOMER LEDGER");
     }
     AccountDto accountDto = new AccountDto();
