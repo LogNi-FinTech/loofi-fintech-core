@@ -23,6 +23,7 @@ LogNi Core Engine can be used in the following domain -
 
 
 # Contribution guideline
+- give star to the repo
 - fork the repo
 - create a branch
 - create pull request
@@ -41,5 +42,6 @@ LogNi Core Engine can be used in the following domain -
 - LinkedIn :
     - https://www.linkedin.com/company/90690030
 - Email: lognifintech@gmail.com
-
+# Join Community 
+- https://www.linkedin.com/groups/14134418/
 
