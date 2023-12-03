@@ -8,8 +8,7 @@ Technology: Java 11, Spring Boot, Postgres
 LogNi Core Engine can be used in the following domain -
 - FinTech 
 - MFI/MFS
-- Mobile Banking
-- e-Wallet
+- e-Wallet/Digital Wallet
 - BNPL
 - Virtual Card
 - WealthTech
@@ -18,14 +17,13 @@ LogNi Core Engine can be used in the following domain -
 - Payment Platform
 - Lending Platform
 - Investment Platform
-- Payment Processor
 - Any tech company who want to receive, store and transact e-money
 
 
 # Contribution guideline
 - give star to the repo
-- fork the repo
 - create a branch
+- change the code 
 - create pull request
 
 # Anyone can contribute following areas:
@@ -39,7 +37,7 @@ LogNi Core Engine can be used in the following domain -
 - Upgrade dependency
 
 # Contact:
-- LinkedIn :
+- LinkedIn Group:
     - https://www.linkedin.com/company/90690030
 - Email: lognifintech@gmail.com
 # Join Community 
