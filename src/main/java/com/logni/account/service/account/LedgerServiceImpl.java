@@ -1,7 +1,6 @@
 package com.logni.account.service.account;
 
 import com.logni.account.config.UserData;
-import com.logni.account.dto.rest.account.AcBalance;
 import com.logni.account.dto.rest.account.LedgerBalanceDto;
 import com.logni.account.entities.accounts.Account;
 import com.logni.account.entities.accounts.Ledger;
@@ -15,17 +14,13 @@ import com.logni.account.repository.account.LedgerRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class LedgerServiceImpl implements LedgerService {
