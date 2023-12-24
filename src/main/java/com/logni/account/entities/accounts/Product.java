@@ -3,8 +3,7 @@ package com.logni.account.entities.accounts;
 import com.logni.account.entities.common.Auditable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "product")
