@@ -4,11 +4,13 @@ import com.logni.account.entities.common.Auditable;
 import com.logni.account.enums.AccountState;
 
 import java.time.Instant;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+
 import java.math.BigDecimal;
 import java.util.List;
 

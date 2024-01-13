@@ -1,24 +1,22 @@
 package com.logni.account.entities.transactions;
 
 import com.logni.account.entities.accounts.Account;
-import com.logni.account.utils.JsonType;
-import com.sun.istack.NotNull;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
 @Entity
 @Table(name = "member_account_entries",indexes = @Index(name = "idx_member_account_txn_time",columnList = "txn_time"))
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @NamedEntityGraph(name = "ma.stmt",attributeNodes = {
                 @NamedAttributeNode("transaction"),
                 @NamedAttributeNode("account"),
@@ -50,8 +48,8 @@ public class MemberAcEntries  {
     @ManyToOne(fetch = FetchType.LAZY)
     private TransactionType txnType;
 
-    @Type(type = "jsonb")
-    @Column(name = "data",columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data")
     private String data;
 
     @Column(name = "txn_time")

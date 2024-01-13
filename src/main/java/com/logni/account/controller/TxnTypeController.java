@@ -9,8 +9,9 @@ import com.logni.account.repository.transaction.TxnTypeRepository;
 
 import java.util.Optional;
 
-import javax.annotation.Resource;
 
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +22,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 
 
 @Slf4j

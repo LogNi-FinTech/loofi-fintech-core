@@ -1,16 +1,14 @@
 package com.logni.account.entities.transactions;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.logni.account.entities.common.InsertAudit;
-import com.logni.account.utils.JsonType;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import jakarta.persistence.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +17,6 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "transactions" ,indexes = {@Index(name = "idx_txn_time",columnList = "txn_time")})
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Transactions extends InsertAudit<String> { // have unit transaciton may have multiple sub transaction
 
     @Id
@@ -38,7 +35,7 @@ public class Transactions extends InsertAudit<String> { // have unit transaciton
     private String channel;
     private String tag;
 
-    @Type(type = "jsonb")
-    @Column(name = "data",columnDefinition = "jsonb")
-    private JsonNode  data;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data")
+    private JsonNode data;
 }

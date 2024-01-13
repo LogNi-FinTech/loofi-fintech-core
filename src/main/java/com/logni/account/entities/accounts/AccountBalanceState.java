@@ -4,10 +4,10 @@ package com.logni.account.entities.accounts;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity

@@ -2,14 +2,15 @@ package com.logni.account.entities.transactions;
 
 import com.logni.account.entities.accounts.Account;
 import com.logni.account.entities.common.Auditable;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.util.Collection;
+
 @Getter
 @Setter
 @Entity

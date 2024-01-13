@@ -1,14 +1,10 @@
 package com.logni.account.entities.transactions;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.logni.account.entities.accounts.Account;
-import com.logni.account.utils.JsonType;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 //@Embeddable
 public class AccountEntries { // maintain member type ledger
@@ -28,7 +24,6 @@ public class AccountEntries { // maintain member type ledger
     @ManyToOne
     private TransactionType txnType;
 
-    @Type(type = "jsonb")
     @Column(name = "data",columnDefinition = "jsonb")
     private String data;
 

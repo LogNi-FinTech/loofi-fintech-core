@@ -3,7 +3,7 @@ package com.logni.account.entities.accounts;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Getter
 @Setter

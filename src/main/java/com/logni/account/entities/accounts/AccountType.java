@@ -2,8 +2,7 @@ package com.logni.account.entities.accounts;
 
 import com.logni.account.entities.common.Auditable;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "account_type")
