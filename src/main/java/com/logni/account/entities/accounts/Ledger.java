@@ -20,7 +20,6 @@ public class Ledger  extends Auditable<String> {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
     @Column(name = "only_parent")
     Boolean onlyParent;
 
