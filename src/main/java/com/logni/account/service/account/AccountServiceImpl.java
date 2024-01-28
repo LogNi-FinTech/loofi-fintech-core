@@ -15,6 +15,7 @@ import com.logni.account.entities.accounts.MemberLedgerBalanceState;
 import com.logni.account.entities.common.AccountConfig;
 import com.logni.account.entities.transactions.LedgerAcEntries;
 import com.logni.account.entities.transactions.MemberAcEntries;
+import com.logni.account.enums.AccountHead;
 import com.logni.account.enums.AccountState;
 import com.logni.account.enums.LedgerType;
 import com.logni.account.exception.CommonException;
@@ -42,6 +43,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -136,6 +138,19 @@ public class AccountServiceImpl implements AccountService {
 
   }
 
+  @Transactional(readOnly = true)
+  public Page<AccountDto> searchAccount(Pageable pageable, String identifier, AccountHead accountHead) {
+    if (Objects.isNull(identifier) && Objects.isNull(accountHead)) {
+      return accountRepository.findAll(pageable).map(this::adaptAccount);
+    } else if (Objects.nonNull(identifier) && Objects.isNull(accountHead)) {
+      return accountRepository.findAllByIdentifierLike(pageable, identifier).map(this::adaptAccount);
+    } else if (Objects.isNull(identifier)) {
+      return accountRepository.findAllByLedgerHead(pageable, accountHead).map(this::adaptAccount);
+    } else {
+      return accountRepository.findAllByIdentifierAndHead(pageable, accountHead, identifier).map(this::adaptAccount);
+    }
+  }
+
   @Transactional
   public void activateAccount(AcActivationDto activationDto) {
     Account account = accountRepository.findByIdentifier(activationDto.getIdentifier());
@@ -195,9 +210,12 @@ public class AccountServiceImpl implements AccountService {
     System.out.println();
     Account account = accountRepository.findByIdentifier(identifier);
     accountNotFoundCheck(account);
-    checkMemberAc(account);
     BigDecimal balance;
-    balance = account.getBalance();
+    if (account.getLedger().getType() == LedgerType.MEMBER) {
+      balance = account.getBalance();
+    } else {
+      return getLedgerBalance(identifier);
+    }
     // todo need ot implement available balance, maintain pending and rejected ledger table
     return new AcBalance(account.getIdentifier(), balance, balance);
   }
@@ -206,15 +224,17 @@ public class AccountServiceImpl implements AccountService {
   public Page<StmtTxn> accountStatement(String identifier, Pageable pageable) {
     Account account = accountRepository.findByIdentifier(identifier);
     accountNotFoundCheck(account);
-    checkMemberAc(account);
-    Page<MemberAcEntries> memberAcEntriesPage = memberAcEntriesRepository.findAllByAccount(account, pageable);
-    if (memberAcEntriesPage == null) {
-      return new PageImpl<>(new ArrayList<>(), pageable, 0);
+    Page<?> entriesPage;
+    if (account.getLedger().getType() == LedgerType.MEMBER) {
+      entriesPage = memberAcEntriesRepository.findAllByAccount(account, pageable);
     } else {
-      List<StmtTxn> stmtTxnList = memberAcEntriesPage.get().map(this::adaptStatement).collect(Collectors.toList());
-      return new PageImpl<>(stmtTxnList, pageable, memberAcEntriesPage.getTotalElements());
+      entriesPage = ledgerAcEntriesRepository.findAllByAccount(account, pageable);
     }
-
+    if (entriesPage == null) {
+      return new PageImpl<>(Collections.emptyList(), pageable, 0);
+    }
+    List<StmtTxn> stmtTxnList = entriesPage.get().map(this::adaptStatement).collect(Collectors.toList());
+    return new PageImpl<>(stmtTxnList, pageable, entriesPage.getTotalElements());
   }
 
   private void accountNotFoundCheck(Object account) {
@@ -224,12 +244,6 @@ public class AccountServiceImpl implements AccountService {
     }
   }
 
-  private void checkMemberAc(Account account) {
-    if (account.getLedger().getType() != LedgerType.MEMBER) {
-      throw new CommonException(AccountErrors.getErrorCode(AccountErrors.ACCOUNT_MANAGEMENT, AccountErrors.INVALID_AC_TYPE),
-        AccountErrors.ERROR_MAP.get(AccountErrors.INVALID_AC_TYPE));
-    }
-  }
 
   private void checkSystemAc(Account account) {
     if (account.getLedger().getType() != LedgerType.SYSTEM) {
@@ -319,7 +333,7 @@ public class AccountServiceImpl implements AccountService {
     if (time == null) {
       time = Instant.now();
     }
-    BigDecimal balance = BigDecimal.ZERO;
+    BigDecimal balance;
     MemberLedgerBalanceState memberLedgerBalanceState = memberLedgerBalanceStateRepo.findTopByLedgerAndBalanceAtBeforeOrderByIdDesc(ledger, time);
     if (memberLedgerBalanceState == null) {
       balance = memberAcEntriesRepository.getBalanceSumUptoTime(ledger, time);

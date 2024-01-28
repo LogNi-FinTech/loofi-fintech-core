@@ -8,6 +8,7 @@ import com.logni.account.dto.rest.account.AccountDto;
 import com.logni.account.dto.rest.account.StmtTxn;
 import com.logni.account.entities.accounts.Account;
 import com.logni.account.entities.accounts.Ledger;
+import com.logni.account.enums.AccountHead;
 
 import java.time.Instant;
 
@@ -25,6 +26,8 @@ public interface AccountService {
   Account getAccountByIdentifier(String identifier);
 
   AccountDto getAccountDetails(String identifier);
+
+  Page<AccountDto> searchAccount(Pageable pageable, String identifier, AccountHead accountHead);
 
   List<AccountDto> getAccountByCustomerId(String customerId);
 

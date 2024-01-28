@@ -1,5 +1,5 @@
 package com.logni.account.enums;
 
-public enum  LedgerType {
-    MEMBER,SYSTEM;
+public enum LedgerType {
+  MEMBER, SYSTEM;
 }

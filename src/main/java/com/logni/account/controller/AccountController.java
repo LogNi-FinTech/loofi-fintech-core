@@ -6,6 +6,7 @@ import com.logni.account.dto.rest.account.AcBalance;
 import com.logni.account.dto.rest.account.AcCloseDto;
 import com.logni.account.dto.rest.account.AccountDto;
 import com.logni.account.dto.rest.account.StmtTxn;
+import com.logni.account.enums.AccountHead;
 import com.logni.account.service.account.AccountService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +49,14 @@ public class AccountController {
     return ResponseEntity.ok().build();
 
   }
+
+  @Operation(summary = "Account Detail.", description = "", tags = {"account"})
+  @GetMapping("/v1/account/search")
+  public Page<AccountDto> accountSearch(Pageable pageable, @RequestParam(value = "identifier", required = false) String identifier, @RequestParam(value = "head", required = false) AccountHead accountHead) {
+    log.info("Search Account .Identifier:{}, Head:{}", identifier, accountHead);
+    return accountService.searchAccount(pageable, identifier, accountHead);
+  }
+
 
   @Operation(summary = "Account Detail.", description = "", tags = {"account"})
   @GetMapping("/v1/account/{identifier}")

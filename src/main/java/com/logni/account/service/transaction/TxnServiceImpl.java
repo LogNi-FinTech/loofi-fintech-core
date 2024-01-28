@@ -312,10 +312,8 @@ public class TxnServiceImpl implements TxnService {
 
     BigDecimal subTxnAmount = BigDecimal.ZERO;
     switch (txnFee.getChargeType()) {
-      case FIXED:
-        subTxnAmount = txnFee.getFixedAmount();
-        break;
-      case PERCENTAGE:
+      case FIXED -> subTxnAmount = txnFee.getFixedAmount();
+      case PERCENTAGE -> {
         subTxnAmount = amount.multiply(txnFee.getPercentage()).divide(BigDecimal.valueOf(100));
         if (txnFee.getMaxPercentageAmount() != null && subTxnAmount.compareTo(txnFee.getMaxPercentageAmount()) > 0) {
           subTxnAmount = txnFee.getMaxPercentageAmount();
@@ -323,13 +321,13 @@ public class TxnServiceImpl implements TxnService {
         if (txnFee.getMinPercentageAmount() != null && subTxnAmount.compareTo(txnFee.getMaxPercentageAmount()) < 0) {
           subTxnAmount = txnFee.getMinPercentageAmount();
         }
-        break;
-      case A_RATE:
-        throw new RuntimeException("NOT_IMPLEMENTED");
-        //break;
-      case D_RATE:
-        throw new RuntimeException("NOT_IMPLEMENTED");
-        //break;
+      }
+      case A_RATE -> throw new RuntimeException("NOT_IMPLEMENTED");
+
+      //break;
+      case D_RATE -> throw new RuntimeException("NOT_IMPLEMENTED");
+
+      //break;
     }
 
     if (Constants.minimumTxnAmount.compareTo(subTxnAmount) > 0) {

@@ -13,7 +13,7 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtTokenUtil {
 
-    private final String key ="secret_key";
+    private final String key ="authenticationSecret&KEYWILLBESTOREDSSMKMSHSM";
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
@@ -25,17 +25,16 @@ public class JwtTokenUtil {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
-    //for retrieveing any information from token we will need the secret key
+    //for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
-       // return Jwts.parser().parseClaimsJws(token).getBody();
         return Jwts.parser()
-          .verifyWith(getSecretgKey())
+          .verifyWith(getSecretKey())
           .build()
           .parseSignedClaims(token)
           .getPayload();
     }
 
-    private SecretKey getSecretgKey(){
+    private SecretKey getSecretKey(){
       return Keys.hmacShaKeyFor(Decoders.BASE64.decode(key));
     }
 }

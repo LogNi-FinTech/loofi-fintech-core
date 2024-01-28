@@ -26,17 +26,6 @@ public interface MemberAcEntriesRepository extends JpaRepository<MemberAcEntries
     @Query("SELECT SUM(e.amount) FROM MemberAcEntries e where e.account.ledger=?1 and e.txnTime<?2")
     BigDecimal getBalanceSumUptoTime(Ledger ledger,  Instant uptoTime);
 
-    //todo improve it
-    @Query("SELECT distinct(e.account) FROM MemberAcEntries e where e.txnTime>=?1 and e.txnTime<?2")
-    List<Account> getAccountsWhoDidTxnLastDay(Instant fromDate, Instant toDate);
-
-
-    @Query("SELECT SUM(e.amount) FROM MemberAcEntries e where e.account=?1 and e.txnTime>=?2 and e.txnTime<?3")
-    BigDecimal getBalanceSumAcFromToUptoTime(Account account,  Instant fromTime,Instant toTime);
-
-    @Query("SELECT SUM(e.amount) FROM MemberAcEntries e where e.account=?1 and e.txnTime<?2")
-    BigDecimal getBalanceSumAcUptoTime(Account account,  Instant uptoTime);
-
     List<MemberAcEntries> findAllByTransaction(Transactions transaction);
 
 }

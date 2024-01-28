@@ -11,34 +11,38 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
 @Setter
 public class AccountDto {
 
-   @NotBlank
-   private String name;
+  private Long id;
+  @NotBlank
+  private String name;
 
-   @NotBlank
-   private String identifier;
+  @NotBlank
+  private String identifier;
 
-   @NotNull
-   @Min(1)
-   private Long ledgerId;
+  @NotNull
+  @Min(1)
+  private Long ledgerId;
 
-   private String ledgerName;
+  private String ledgerName;
 
-   @NotBlank String customerId;
+  @NotBlank String customerId;
 
-   private AccountState state;
+  private AccountState state;
 
-   private AccountType type;
+  private AccountType type;
 
-   List<AccountTag> tagList;
+  List<AccountTag> tagList;
 
-   private BigDecimal lowerLimit;
+  private BigDecimal lowerLimit;
 
-   private String alternativeAccountNumber;
+  private String alternativeAccountNumber;
+
+  private Instant createdDate;
 
 }
