@@ -317,7 +317,6 @@ public class TxnServiceImpl implements TxnService {
         break;
       case PERCENTAGE:
         subTxnAmount = amount.multiply(txnFee.getPercentage()).divide(BigDecimal.valueOf(100));
-
         if (txnFee.getMaxPercentageAmount() != null && subTxnAmount.compareTo(txnFee.getMaxPercentageAmount()) > 0) {
           subTxnAmount = txnFee.getMaxPercentageAmount();
         }
@@ -331,7 +330,6 @@ public class TxnServiceImpl implements TxnService {
       case D_RATE:
         throw new RuntimeException("NOT_IMPLEMENTED");
         //break;
-
     }
 
     if (Constants.minimumTxnAmount.compareTo(subTxnAmount) > 0) {
